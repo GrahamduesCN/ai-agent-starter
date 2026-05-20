@@ -43,4 +43,4 @@ If this project helps you, please consider:
 
 ## 📄 License
 
-MIT © [GrahamduesCN](https://github.com/GrahamduesCN)
+MIT © [GrahamduesCN](https://github.com/GrahamduesCN)\n\n## 💖 Support This Project\n\nIf this project helps you, please support:\n\n| Method | Link |\n|--------|------|\n| PayPal | [paypal.me/GrahamduesCN](https://paypal.me/GrahamduesCN) |\n| Buy Me a Coffee | [buymeacoffee.com/GrahamduesCN](https://www.buymeacoffee.com/GrahamduesCN) |\n| GitHub Sponsor | [github.com/sponsors/GrahamduesCN](https://github.com/sponsors/GrahamduesCN) |\n\nEvery contribution helps keep this project maintained and growing!
