@@ -1,0 +1,29 @@
+{
+  "name": "ai-agent-starter",
+  "version": "0.1.0",
+  "description": "Production-ready AI agent framework starter kit with built-in tool support and memory management",
+  "keywords": ["ai", "agent", "llm", "openai", "framework", "starter"],
+  "license": "MIT",
+  "author": "GrahamduesCN",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GrahamduesCN/ai-agent-starter.git"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0",
+    "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tsx": "^4.0.0",
+    "vitest": "^1.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
