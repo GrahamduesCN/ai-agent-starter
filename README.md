@@ -1,46 +1,184 @@
-# ai-agent-starter
+# AI Agent Starter
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/GrahamduesCN/ai-agent-starter/pulls)
-[![GitHub stars](https://img.shields.io/github/stars/GrahamduesCN/ai-agent-starter?style=social)](https://github.com/GrahamduesCN/ai-agent-starter)
+Multi-provider AI agent framework with **real** function calling, conversation memory, and streaming output.
 
-> Production-ready AI agent framework starter kit - Build AI agents in minutes, not weeks
+## What this actually is
 
-## ✨ Features
+A TypeScript library that lets you:
 
-- Multi-provider support (OpenAI, Anthropic, Ollama)
-- Built-in tool execution engine
-- Conversation memory with compression
-- Type-safe agent configuration
-- CLI and programmatic API
+- Call LLMs from **OpenAI**, **Anthropic**, or **Ollama** (local) through one unified API
+- Give agents tools (functions) they can call — using native `function calling`, not string parsing
+- Manage conversation memory with automatic token-aware pruning
+- Stream responses in real-time
+- Run as a CLI (`npx ai-agent-starter chat`) or import as a library
 
-## 🚀 Quick Start
+## What this is NOT
+
+- Not a no-code drag-and-drop AI builder
+- Not a production SaaS with a dashboard
+- Does not include a web UI
+
+## Quick Start
+
+### Install
 
 ```bash
 npm install ai-agent-starter
-npx ai-agent-starter
 ```
 
-## 📖 Basic Usage
+### Use in code
 
 ```typescript
-import { Agent, OpenAIProvider } from 'ai-agent-starter';
+import { Agent, AIClient, OpenAIProvider } from 'ai-agent-starter';
 
-const agent = new Agent({
-  provider: new OpenAIProvider({ apiKey: process.env.OPENAI_API_KEY }),
-  systemPrompt: 'You are a helpful assistant.'
+const client = new AIClient(
+  new OpenAIProvider({ apiKey: process.env.OPENAI_API_KEY! })
+);
+
+const agent = new Agent(client, {
+  systemPrompt: 'You are a helpful assistant.',
+  tools: [
+    {
+      name: 'get_weather',
+      description: 'Get current weather for a city',
+      parameters: {
+        type: 'object',
+        properties: {
+          city: { type: 'string', description: 'City name' }
+        },
+        required: ['city']
+      },
+      execute: async (params) => {
+        // Call your weather API here
+        return `Weather in ${params.city}: 22°C, sunny`;
+      }
+    }
+  ]
 });
 
-const response = await agent.run('Hello!');
-console.log(response);
+// One-shot
+const answer = await agent.run('What is the weather in Tokyo?');
+console.log(answer);
+
+// Streaming
+for await (const chunk of agent.stream('Tell me a story')) {
+  process.stdout.write(chunk);
+}
 ```
 
-## 💖 Support
+### CLI
 
-If this project helps you, please consider:
-- ⭐ Starring the repository
-- 💰 [Sponsoring on GitHub](https://github.com/sponsors/GrahamduesCN)
+```bash
+# Set your API key
+export OPENAI_API_KEY=sk-...
 
-## 📄 License
+# Interactive chat
+npx ai-agent-starter chat
 
-MIT © [GrahamduesCN](https://github.com/GrahamduesCN)\n\n## 💖 Support This Project\n\nIf this project helps you, please support:\n\n| Method | Link |\n|--------|------|\n| PayPal | [paypal.me/GrahamduesCN](https://paypal.me/GrahamduesCN) |\n| Buy Me a Coffee | [buymeacoffee.com/GrahamduesCN](https://www.buymeacoffee.com/GrahamduesCN) |\n| GitHub Sponsor | [github.com/sponsors/GrahamduesCN](https://github.com/sponsors/GrahamduesCN) |\n\nEvery contribution helps keep this project maintained and growing!
+# One-shot
+npx ai-agent-starter run "Explain quantum computing in one sentence"
+
+# HTTP API server
+npx ai-agent-starter serve --port 3000
+# Then: curl -X POST http://localhost:3000/chat -d '{"messages":"hello"}'
+```
+
+### Other providers
+
+```typescript
+// Anthropic
+import { AnthropicProvider } from 'ai-agent-starter';
+const client = new AIClient(
+  new AnthropicProvider({ apiKey: process.env.ANTHROPIC_API_KEY! })
+);
+
+// Ollama (local)
+import { OllamaProvider } from 'ai-agent-starter';
+const client = new AIClient(
+  new OllamaProvider({ baseURL: 'http://localhost:11434' })
+);
+```
+
+## API Reference
+
+### `AIClient`
+
+Unified interface for all providers.
+
+| Method | Description |
+|--------|-------------|
+| `ask(prompt, systemPrompt?)` | Simple one-shot question, returns string |
+| `chat(messages, options?)` | Full chat with tools, returns `AIResponse` |
+| `stream(messages, options?)` | Streaming chat, returns `AsyncIterable<StreamChunk>` |
+| `setProvider(provider)` | Switch provider at runtime |
+
+### `Agent`
+
+Stateful agent with memory and tools.
+
+| Method | Description |
+|--------|-------------|
+| `run(input)` | Process user input, execute tools, return response |
+| `stream(input)` | Same as `run()` but yields tokens as they arrive |
+| `addTool(tool)` | Register a tool the agent can call |
+| `removeTool(name)` | Remove a tool |
+| `getMemory()` | Get full conversation history |
+| `clearMemory()` | Reset conversation (keeps system prompt) |
+| `setSystemPrompt(text)` | Change system prompt |
+| `tokenCount()` | Estimated token count of current memory |
+
+### `AITool`
+
+```typescript
+interface AITool {
+  name: string;
+  description: string;
+  parameters: {
+    type: 'object';
+    properties: Record<string, {
+      type: string;
+      description: string;
+      enum?: string[];
+    }>;
+    required?: string[];
+  };
+  execute(params: Record<string, unknown>): Promise<string> | string;
+}
+```
+
+### `MemoryManager`
+
+```typescript
+const mem = new MemoryManager({ maxTokens: 8000 });
+mem.add({ role: 'user', content: '...' });
+mem.setSystemPrompt('You are helpful.');
+mem.clear(); // keeps system prompt
+mem.tokenCount(); // estimated tokens
+```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `OPENAI_API_KEY` | OpenAI API key | (required for OpenAI) |
+| `OPENAI_BASE_URL` | OpenAI-compatible endpoint | `https://api.openai.com/v1` |
+| `ANTHROPIC_API_KEY` | Anthropic API key | (required for Anthropic) |
+| `OLLAMA_BASE_URL` | Ollama server URL | `http://localhost:11434` |
+| `AI_PROVIDER` | `openai` / `anthropic` / `ollama` | `openai` |
+| `AI_MODEL` | Override default model | provider default |
+
+## Running Tests
+
+```bash
+npm test
+```
+
+24 tests covering providers, agent, memory, and token counting.
+
+## License
+
+MIT
+
+## Support
+
+If you find this useful, consider starring the repo ⭐ or [sponsoring](https://github.com/sponsors/GrahamduesCN).

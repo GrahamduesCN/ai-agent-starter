@@ -1,24 +1,44 @@
 {
   "name": "ai-agent-starter",
-  "version": "0.1.0",
-  "description": "Production-ready AI agent framework starter kit with built-in tool support and memory management",
-  "keywords": ["ai", "agent", "llm", "openai", "framework", "starter"],
+  "version": "0.2.0",
+  "description": "Multi-provider AI agent framework with real function calling, memory management, and streaming. Supports OpenAI, Anthropic, and Ollama.",
+  "keywords": ["ai", "agent", "llm", "openai", "anthropic", "ollama", "framework"],
   "license": "MIT",
   "author": "GrahamduesCN",
   "repository": {
     "type": "git",
     "url": "https://github.com/GrahamduesCN/ai-agent-starter.git"
   },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "ai-agent-starter": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "commander": "^12.0.0",
     "chalk": "^5.3.0",
-    "openai": "^4.0.0"
+    "commander": "^12.0.0"
   },
   "devDependencies": {
     "typescript": "^5.4.0",
