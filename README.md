@@ -179,6 +179,14 @@ npm test
 
 MIT
 
+## Related Projects
+
+| Project | Description |
+|---------|-------------|
+| [dev-cli-kit](https://github.com/GrahamduesCN/dev-cli-kit) | Developer CLI toolkit with project scaffolding and code generation |
+| [nextjs-saas-starter](https://github.com/GrahamduesCN/nextjs-saas-starter) | Next.js 14 SaaS starter with dashboard, auth pages, and billing |
+| [ai-chat-saas](https://github.com/GrahamduesCN/ai-chat-saas) | Complete AI chat app built with this framework ($19 template) |
+
 ## Support
 
-If you find this useful, consider starring the repo ⭐ or [sponsoring](https://github.com/sponsors/GrahamduesCN).
+If you find this useful, consider starring the repo ⭐.
